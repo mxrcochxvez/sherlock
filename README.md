@@ -69,10 +69,3 @@ Run the compiled CLI:
 ```bash
 node dist/bin/sherlook.js investigate
 ```
-
-## Demo site (GitHub Pages)
-
-The demo lives in `docs/`. To publish:
-
-1. Push `docs/` to `main`.
-2. In GitHub repo settings, enable Pages and choose `main` + `/docs`.
