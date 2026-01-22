@@ -1,0 +1,20 @@
+{
+  "name": "sherlock",
+  "version": "0.1.0",
+  "description": "AI-powered developer assistant CLI.",
+  "type": "module",
+  "bin": {
+    "sherlock": "bin/sherlock.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.5",
+    "inquirer": "^9.2.17",
+    "ora": "^8.0.1"
+  }
+}
