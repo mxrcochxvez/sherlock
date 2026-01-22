@@ -1,8 +1,18 @@
 const DEFAULT_GOOGLE_URL =
   "https://generativelanguage.googleapis.com/v1beta/models";
 
+type GoogleProviderOptions = {
+  apiKey?: string;
+  model?: string;
+  apiUrl?: string;
+};
+
 export class GoogleAIProvider {
-  constructor({ apiKey, model, apiUrl } = {}) {
+  private apiKey: string;
+  private model: string;
+  private apiUrl: string;
+
+  constructor({ apiKey, model, apiUrl }: GoogleProviderOptions = {}) {
     if (!apiKey) {
       throw new Error("Google AI provider requires SHERLOCK_API_KEY to be set.");
     }
@@ -15,7 +25,7 @@ export class GoogleAIProvider {
     this.apiUrl = apiUrl || DEFAULT_GOOGLE_URL;
   }
 
-  async generateResponse(systemPrompt, userPrompt) {
+  async generateResponse(systemPrompt: string, userPrompt: string): Promise<string> {
     const url = `${this.apiUrl}/${encodeURIComponent(
       this.model
     )}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
@@ -45,7 +55,9 @@ export class GoogleAIProvider {
       );
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    };
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (typeof text !== "string") {
       throw new Error("Google AI response missing expected text content.");

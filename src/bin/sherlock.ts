@@ -6,26 +6,45 @@ import ora from "ora";
 import "dotenv/config";
 import { readdir, readFile } from "node:fs/promises";
 import { join, resolve, relative } from "node:path";
-import { createAIService } from "../src/ai/index.js";
+import { createAIService } from "../ai/index.js";
 import {
   clearConfig,
   loadConfig,
   saveConfig,
   CONFIG_PATH,
-} from "../src/config.js";
+  type SherlockConfig,
+} from "../config.js";
 
-async function readTextFile(path) {
+type ExplainOptions = {
+  perspective?: string;
+};
+
+type AuthAnswers = {
+  provider: string;
+  apiKey?: string;
+  model: string;
+  apiUrl?: string;
+};
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
+
+async function readTextFile(path: string): Promise<string | null> {
   try {
     return await readFile(path, "utf8");
   } catch (error) {
-    if (error && error.code === "ENOENT") {
+    if (error && (error as NodeJS.ErrnoException).code === "ENOENT") {
       return null;
     }
     throw error;
   }
 }
 
-async function listDepthOne(cwd) {
+async function listDepthOne(cwd: string): Promise<string[]> {
   const entries = await readdir(cwd, { withFileTypes: true });
   return entries
     .filter((entry) => !entry.name.startsWith("."))
@@ -33,7 +52,7 @@ async function listDepthOne(cwd) {
     .sort((a, b) => a.localeCompare(b));
 }
 
-function applyConfigToEnv(config) {
+function applyConfigToEnv(config: SherlockConfig): void {
   const entries = Object.entries(config || {});
   for (const [key, value] of entries) {
     if (value == null || value === "") {
@@ -45,8 +64,11 @@ function applyConfigToEnv(config) {
   }
 }
 
-async function listFilesRecursive(rootDir, ignoreNames) {
-  const results = [];
+async function listFilesRecursive(
+  rootDir: string,
+  ignoreNames: Set<string>
+): Promise<string[]> {
+  const results: string[] = [];
   const entries = await readdir(rootDir, { withFileTypes: true });
 
   for (const entry of entries) {
@@ -65,7 +87,7 @@ async function listFilesRecursive(rootDir, ignoreNames) {
   return results;
 }
 
-async function investigateCommand() {
+async function investigateCommand(): Promise<void> {
   const spinner = ora("Analyzing project...").start();
   try {
     const cwd = process.cwd();
@@ -76,7 +98,7 @@ async function investigateCommand() {
     ]);
 
     const systemPrompt =
-      "You are Sherlock, a senior engineer assistant. Provide a concise mental model of the project.";
+      "You are Sherlock, a senior engineer assistant. Provide a concise, multi-perspective mental model of the project. Cover architecture, entry points, core flows, design system/UI patterns (if any), documented conventions, and common software patterns. Call out known issues or caveats if mentioned, and highlight likely hotspots (e.g., frequently touched or central files inferred from the structure). Keep it short, specific, and actionable.";
     const userPrompt = [
       "Project metadata:",
       "",
@@ -98,13 +120,15 @@ async function investigateCommand() {
     process.stdout.write(`${chalk.green("Sherlock:")}\n${response}\n`);
   } catch (error) {
     spinner.stop();
-    const message = error && error.message ? error.message : String(error);
-    process.stderr.write(`${chalk.red("Error:")} ${message}\n`);
+    process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
     process.exitCode = 1;
   }
 }
 
-async function explainCommand(filePath, options) {
+async function explainCommand(
+  filePath: string,
+  options: ExplainOptions
+): Promise<void> {
   const spinner = ora("Reading file...").start();
   try {
     const cwd = process.cwd();
@@ -121,7 +145,7 @@ async function explainCommand(filePath, options) {
 
     const perspective = options.perspective || "general";
     const systemPrompt =
-      "You are Sherlock, a senior engineer assistant. Explain code clearly and succinctly.";
+      "You are Sherlock, a senior engineer assistant. Explain code clearly and succinctly. Include architecture role, design/system considerations, data flow, common patterns, and any risks or caveats you can infer. Keep it focused and actionable.";
     const userPrompt = [
       `Perspective: ${perspective}`,
       `File: ${relative(cwd, absolutePath)}`,
@@ -135,13 +159,12 @@ async function explainCommand(filePath, options) {
     process.stdout.write(`${chalk.green("Sherlock:")}\n${response}\n`);
   } catch (error) {
     spinner.stop();
-    const message = error && error.message ? error.message : String(error);
-    process.stderr.write(`${chalk.red("Error:")} ${message}\n`);
+    process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
     process.exitCode = 1;
   }
 }
 
-async function blueprintCommand(request) {
+async function blueprintCommand(request: string): Promise<void> {
   const spinner = ora("Scanning project...").start();
   try {
     const cwd = process.cwd();
@@ -152,7 +175,7 @@ async function blueprintCommand(request) {
       .sort((a, b) => a.localeCompare(b));
 
     const systemPrompt =
-      "You are Sherlock, a senior engineer assistant. Identify relevant files for implementing the request.";
+      "You are Sherlock, a senior engineer assistant. Identify relevant files for implementing the request. Consider architecture boundaries, design system/UI implications, shared patterns, and likely hotspots to change. Return a short, actionable list.";
     const userPrompt = [
       "Project file structure (paths only):",
       "",
@@ -169,13 +192,12 @@ async function blueprintCommand(request) {
     process.stdout.write(`${chalk.green("Sherlock:")}\n${response}\n`);
   } catch (error) {
     spinner.stop();
-    const message = error && error.message ? error.message : String(error);
-    process.stderr.write(`${chalk.red("Error:")} ${message}\n`);
+    process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
     process.exitCode = 1;
   }
 }
 
-async function authLoginCommand() {
+async function authLoginCommand(): Promise<void> {
   const spinner = ora("Saving credentials...").start();
   try {
     spinner.stop();
@@ -191,7 +213,7 @@ async function authLoginCommand() {
       "mistral",
       "perplexity",
     ];
-    const defaultModels = {
+    const defaultModels: Record<string, string> = {
       openai: "gpt-4o",
       anthropic: "claude-3-5-sonnet-20240620",
       google: "gemini-1.5-pro",
@@ -203,7 +225,7 @@ async function authLoginCommand() {
       mistral: "mistral-large-latest",
       perplexity: "sonar-pro",
     };
-    const answers = await inquirer.prompt([
+    const answers = (await inquirer.prompt([
       {
         type: "list",
         name: "provider",
@@ -215,31 +237,30 @@ async function authLoginCommand() {
         name: "apiKey",
         message: "API key",
         mask: "*",
-        when: (a) => a.provider !== "ollama",
-        validate: (input) =>
+        when: (a: AuthAnswers) => a.provider !== "ollama",
+        validate: (input: string) =>
           input && input.trim().length > 0 ? true : "API key is required",
       },
       {
         type: "input",
         name: "model",
         message: "Model",
-        default: (a) =>
-          defaultModels[a.provider] || "gpt-4o",
-        validate: (input) =>
+        default: (a: AuthAnswers) => defaultModels[a.provider] || "gpt-4o",
+        validate: (input: string) =>
           input && input.trim().length > 0 ? true : "Model is required",
       },
       {
         type: "input",
         name: "apiUrl",
         message: "API URL (optional)",
-        default: (a) =>
+        default: (a: AuthAnswers) =>
           a.provider === "ollama"
             ? "http://localhost:11434/api/generate"
             : "",
       },
-    ]);
+    ])) as AuthAnswers;
 
-    const config = {
+    const config: SherlockConfig = {
       SHERLOCK_PROVIDER: answers.provider,
       SHERLOCK_API_KEY: answers.apiKey,
       SHERLOCK_MODEL: answers.model,
@@ -249,18 +270,15 @@ async function authLoginCommand() {
     spinner.start("Writing config...");
     await saveConfig(config);
     spinner.stop();
-    process.stdout.write(
-      `${chalk.green("Saved:")} ${CONFIG_PATH}\n`
-    );
+    process.stdout.write(`${chalk.green("Saved:")} ${CONFIG_PATH}\n`);
   } catch (error) {
     spinner.stop();
-    const message = error && error.message ? error.message : String(error);
-    process.stderr.write(`${chalk.red("Error:")} ${message}\n`);
+    process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
     process.exitCode = 1;
   }
 }
 
-async function authLogoutCommand() {
+async function authLogoutCommand(): Promise<void> {
   const spinner = ora("Removing credentials...").start();
   try {
     await clearConfig();
@@ -268,8 +286,7 @@ async function authLogoutCommand() {
     process.stdout.write(`${chalk.green("Removed:")} ${CONFIG_PATH}\n`);
   } catch (error) {
     spinner.stop();
-    const message = error && error.message ? error.message : String(error);
-    process.stderr.write(`${chalk.red("Error:")} ${message}\n`);
+    process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
     process.exitCode = 1;
   }
 }

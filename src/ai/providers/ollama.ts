@@ -1,7 +1,15 @@
 const DEFAULT_OLLAMA_URL = "http://localhost:11434/api/generate";
 
+type OllamaProviderOptions = {
+  model?: string;
+  apiUrl?: string;
+};
+
 export class OllamaProvider {
-  constructor({ model, apiUrl } = {}) {
+  private model: string;
+  private apiUrl: string;
+
+  constructor({ model, apiUrl }: OllamaProviderOptions = {}) {
     if (!model) {
       throw new Error("Ollama provider requires SHERLOCK_MODEL to be set.");
     }
@@ -9,7 +17,7 @@ export class OllamaProvider {
     this.apiUrl = apiUrl || DEFAULT_OLLAMA_URL;
   }
 
-  async generateResponse(systemPrompt, userPrompt) {
+  async generateResponse(systemPrompt: string, userPrompt: string): Promise<string> {
     const response = await fetch(this.apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -28,7 +36,7 @@ export class OllamaProvider {
       );
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { response?: string };
     if (typeof data.response !== "string") {
       throw new Error("Ollama response missing expected 'response' field.");
     }

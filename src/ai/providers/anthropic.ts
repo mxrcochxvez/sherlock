@@ -1,8 +1,18 @@
 const DEFAULT_ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const DEFAULT_MAX_TOKENS = 1024;
 
+type AnthropicProviderOptions = {
+  apiKey?: string;
+  model?: string;
+  apiUrl?: string;
+};
+
 export class AnthropicProvider {
-  constructor({ apiKey, model, apiUrl } = {}) {
+  private apiKey: string;
+  private model: string;
+  private apiUrl: string;
+
+  constructor({ apiKey, model, apiUrl }: AnthropicProviderOptions = {}) {
     if (!apiKey) {
       throw new Error("Anthropic provider requires SHERLOCK_API_KEY to be set.");
     }
@@ -15,7 +25,7 @@ export class AnthropicProvider {
     this.apiUrl = apiUrl || DEFAULT_ANTHROPIC_URL;
   }
 
-  async generateResponse(systemPrompt, userPrompt) {
+  async generateResponse(systemPrompt: string, userPrompt: string): Promise<string> {
     const response = await fetch(this.apiUrl, {
       method: "POST",
       headers: {
@@ -38,7 +48,9 @@ export class AnthropicProvider {
       );
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as {
+      content?: Array<{ text?: string }>;
+    };
     const content = data?.content?.[0]?.text;
     if (typeof content !== "string") {
       throw new Error("Anthropic response missing expected content text.");

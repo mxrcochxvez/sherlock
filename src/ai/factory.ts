@@ -1,7 +1,7 @@
-import { OllamaProvider } from "./providers/ollama.js";
-import { OpenAIProvider } from "./providers/openai.js";
 import { AnthropicProvider } from "./providers/anthropic.js";
 import { GoogleAIProvider } from "./providers/google.js";
+import { OllamaProvider } from "./providers/ollama.js";
+import { OpenAIProvider } from "./providers/openai.js";
 
 const OPENAI_COMPATIBLE = {
   openai: "https://api.openai.com/v1/chat/completions",
@@ -13,7 +13,9 @@ const OPENAI_COMPATIBLE = {
   perplexity: "https://api.perplexity.ai/chat/completions",
 };
 
-export function createProvider(env = process.env) {
+type EnvLike = NodeJS.ProcessEnv;
+
+export function createProvider(env: EnvLike = process.env) {
   const provider = env.SHERLOCK_PROVIDER;
   const model = env.SHERLOCK_MODEL;
   const apiKey = env.SHERLOCK_API_KEY;
@@ -22,7 +24,9 @@ export function createProvider(env = process.env) {
   const appName = env.SHERLOCK_APP_NAME;
 
   if (!provider) {
-    throw new Error("SHERLOCK_PROVIDER is required (openai, ollama, anthropic).");
+    throw new Error(
+      "SHERLOCK_PROVIDER is required (openai, ollama, anthropic)."
+    );
   }
 
   switch (provider) {
@@ -41,7 +45,8 @@ export function createProvider(env = process.env) {
       }
       return new GoogleAIProvider({ apiKey, model, apiUrl });
     default: {
-      const compatibleUrl = OPENAI_COMPATIBLE[provider];
+      const compatibleUrl =
+        OPENAI_COMPATIBLE[provider as keyof typeof OPENAI_COMPATIBLE];
       if (!compatibleUrl) {
         throw new Error(
           `Unknown SHERLOCK_PROVIDER '${provider}'. Use 'openai', 'ollama', 'anthropic', 'google', or an OpenAI-compatible provider.`
@@ -50,7 +55,7 @@ export function createProvider(env = process.env) {
       if (!apiKey) {
         throw new Error(`SHERLOCK_API_KEY is required for ${provider}.`);
       }
-      const extraHeaders = {};
+      const extraHeaders: Record<string, string> = {};
       if (referer) {
         extraHeaders["HTTP-Referer"] = referer;
       }
