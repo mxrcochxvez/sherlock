@@ -77,6 +77,14 @@ SHERLOCK_MODEL=llama3-70b-8192
 SHERLOCK_API_KEY=your_api_key_here
 ```
 
+Hugging Face (router) example:
+
+```bash
+SHERLOCK_PROVIDER=huggingface
+SHERLOCK_MODEL=meta-llama/Meta-Llama-3-8B-Instruct
+SHERLOCK_API_KEY=your_api_key_here
+```
+
 Optional headers for OpenAI-compatible providers:
 
 ```bash
