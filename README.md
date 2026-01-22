@@ -34,6 +34,35 @@ SHERLOCK_MODEL=claude-3-5-sonnet-20240620
 SHERLOCK_API_KEY=your_api_key_here
 ```
 
+Google AI (Gemini) example:
+
+```bash
+SHERLOCK_PROVIDER=google
+SHERLOCK_MODEL=gemini-1.5-pro
+SHERLOCK_API_KEY=your_api_key_here
+```
+
+OpenAI-compatible examples:
+
+```bash
+SHERLOCK_PROVIDER=openrouter
+SHERLOCK_MODEL=openai/gpt-4o
+SHERLOCK_API_KEY=your_api_key_here
+```
+
+```bash
+SHERLOCK_PROVIDER=groq
+SHERLOCK_MODEL=llama3-70b-8192
+SHERLOCK_API_KEY=your_api_key_here
+```
+
+Optional headers for OpenAI-compatible providers:
+
+```bash
+SHERLOCK_REFERER=https://your-app.com
+SHERLOCK_APP_NAME=Sherlock
+```
+
 ## Usage
 
 ```bash
@@ -48,4 +77,13 @@ Once published, you can run:
 
 ```bash
 npx sherlock investigate
+```
+
+## Auth
+
+Store a single active provider locally for npx usage:
+
+```bash
+node bin/sherlock.js auth login
+node bin/sherlock.js auth logout
 ```

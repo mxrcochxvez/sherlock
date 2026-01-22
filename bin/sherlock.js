@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import chalk from "chalk";
+import inquirer from "inquirer";
 import ora from "ora";
 import "dotenv/config";
 import { readdir, readFile } from "node:fs/promises";
 import { join, resolve, relative } from "node:path";
 import { createAIService } from "../src/ai/index.js";
+import {
+  clearConfig,
+  loadConfig,
+  saveConfig,
+  CONFIG_PATH,
+} from "../src/config.js";
 
 async function readTextFile(path) {
   try {
@@ -24,6 +31,18 @@ async function listDepthOne(cwd) {
     .filter((entry) => !entry.name.startsWith("."))
     .map((entry) => (entry.isDirectory() ? `${entry.name}/` : entry.name))
     .sort((a, b) => a.localeCompare(b));
+}
+
+function applyConfigToEnv(config) {
+  const entries = Object.entries(config || {});
+  for (const [key, value] of entries) {
+    if (value == null || value === "") {
+      continue;
+    }
+    if (!process.env[key]) {
+      process.env[key] = String(value);
+    }
+  }
 }
 
 async function listFilesRecursive(rootDir, ignoreNames) {
@@ -156,11 +175,115 @@ async function blueprintCommand(request) {
   }
 }
 
+async function authLoginCommand() {
+  const spinner = ora("Saving credentials...").start();
+  try {
+    spinner.stop();
+    const providers = [
+      "openai",
+      "anthropic",
+      "google",
+      "ollama",
+      "openrouter",
+      "huggingface",
+      "groq",
+      "together",
+      "mistral",
+      "perplexity",
+    ];
+    const defaultModels = {
+      openai: "gpt-4o",
+      anthropic: "claude-3-5-sonnet-20240620",
+      google: "gemini-1.5-pro",
+      ollama: "llama3",
+      openrouter: "openai/gpt-4o",
+      huggingface: "meta-llama/Meta-Llama-3-8B-Instruct",
+      groq: "llama3-70b-8192",
+      together: "meta-llama/Llama-3.1-70B-Instruct-Turbo",
+      mistral: "mistral-large-latest",
+      perplexity: "sonar-pro",
+    };
+    const answers = await inquirer.prompt([
+      {
+        type: "list",
+        name: "provider",
+        message: "Select provider",
+        choices: providers,
+      },
+      {
+        type: "password",
+        name: "apiKey",
+        message: "API key",
+        mask: "*",
+        when: (a) => a.provider !== "ollama",
+        validate: (input) =>
+          input && input.trim().length > 0 ? true : "API key is required",
+      },
+      {
+        type: "input",
+        name: "model",
+        message: "Model",
+        default: (a) =>
+          defaultModels[a.provider] || "gpt-4o",
+        validate: (input) =>
+          input && input.trim().length > 0 ? true : "Model is required",
+      },
+      {
+        type: "input",
+        name: "apiUrl",
+        message: "API URL (optional)",
+        default: (a) =>
+          a.provider === "ollama"
+            ? "http://localhost:11434/api/generate"
+            : "",
+      },
+    ]);
+
+    const config = {
+      SHERLOCK_PROVIDER: answers.provider,
+      SHERLOCK_API_KEY: answers.apiKey,
+      SHERLOCK_MODEL: answers.model,
+      SHERLOCK_API_URL: answers.apiUrl || undefined,
+    };
+
+    spinner.start("Writing config...");
+    await saveConfig(config);
+    spinner.stop();
+    process.stdout.write(
+      `${chalk.green("Saved:")} ${CONFIG_PATH}\n`
+    );
+  } catch (error) {
+    spinner.stop();
+    const message = error && error.message ? error.message : String(error);
+    process.stderr.write(`${chalk.red("Error:")} ${message}\n`);
+    process.exitCode = 1;
+  }
+}
+
+async function authLogoutCommand() {
+  const spinner = ora("Removing credentials...").start();
+  try {
+    await clearConfig();
+    spinner.stop();
+    process.stdout.write(`${chalk.green("Removed:")} ${CONFIG_PATH}\n`);
+  } catch (error) {
+    spinner.stop();
+    const message = error && error.message ? error.message : String(error);
+    process.stderr.write(`${chalk.red("Error:")} ${message}\n`);
+    process.exitCode = 1;
+  }
+}
+
 const program = new Command();
 program
   .name("sherlock")
   .description("AI-powered developer assistant CLI")
   .version("0.1.0");
+
+program.hook("preAction", async () => {
+  const config = await loadConfig();
+  applyConfigToEnv(config);
+});
 
 program
   .command("investigate")
@@ -179,5 +302,15 @@ program
   .argument("<request>", "Feature or change request")
   .description("Suggest which files to modify for a request")
   .action(blueprintCommand);
+
+const auth = program.command("auth").description("Manage credentials");
+auth
+  .command("login")
+  .description("Save provider credentials")
+  .action(authLoginCommand);
+auth
+  .command("logout")
+  .description("Remove saved credentials")
+  .action(authLogoutCommand);
 
 program.parseAsync(process.argv);

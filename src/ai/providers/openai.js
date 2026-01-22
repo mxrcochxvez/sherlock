@@ -1,7 +1,7 @@
 const DEFAULT_OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
 export class OpenAIProvider {
-  constructor({ apiKey, model, apiUrl } = {}) {
+  constructor({ apiKey, model, apiUrl, extraHeaders } = {}) {
     if (!apiKey) {
       throw new Error("OpenAI provider requires SHERLOCK_API_KEY to be set.");
     }
@@ -12,6 +12,7 @@ export class OpenAIProvider {
     this.apiKey = apiKey;
     this.model = model;
     this.apiUrl = apiUrl || DEFAULT_OPENAI_URL;
+    this.extraHeaders = extraHeaders || {};
   }
 
   async generateResponse(systemPrompt, userPrompt) {
@@ -20,6 +21,7 @@ export class OpenAIProvider {
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
         "Content-Type": "application/json",
+        ...this.extraHeaders,
       },
       body: JSON.stringify({
         model: this.model,
