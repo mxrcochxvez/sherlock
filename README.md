@@ -31,6 +31,8 @@ node dist/bin/sherlock.js auth login
 node dist/bin/sherlock.js auth logout
 ```
 
+Note: credentials are stored locally and only used to authenticate API requests.
+
 You can still use environment variables if needed:
 
 ```bash
@@ -59,7 +61,7 @@ Google AI (Gemini) example:
 
 ```bash
 SHERLOCK_PROVIDER=google
-SHERLOCK_MODEL=gemini-1.5-pro
+SHERLOCK_MODEL=gemini-3-flash-preview
 SHERLOCK_API_KEY=your_api_key_here
 ```
 
@@ -98,6 +100,24 @@ SHERLOCK_APP_NAME=Sherlock
 node dist/bin/sherlock.js investigate
 node dist/bin/sherlock.js explain src/ai/factory.ts -p "Security"
 node dist/bin/sherlock.js blueprint "Add a new command for audit logs"
+```
+
+Pick a model for the configured provider:
+
+```bash
+node dist/bin/sherlock.js list
+```
+
+Return plain text (no Markdown):
+
+```bash
+node dist/bin/sherlock.js investigate --plain
+```
+
+Override the model for a single run:
+
+```bash
+node dist/bin/sherlock.js investigate -m gemini-3-flash-preview
 ```
 
 ## npx
