@@ -2,15 +2,40 @@
 
 Sherlock is an AI-powered developer assistant CLI that helps you understand and navigate complex codebases.
 
-## Install
+## Auth
+
+Store a single active provider locally for npx usage:
+
+```bash
+node bin/sherlock.js auth login
+node bin/sherlock.js auth logout
+```
+
+## Usage
+
+```bash
+node bin/sherlock.js investigate
+node bin/sherlock.js explain src/ai/factory.js -p "Security"
+node bin/sherlock.js blueprint "Add a new command for audit logs"
+```
+
+## npx
+
+> 🚧 Once published 🚧
+
+```bash
+npx sherlock investigate
+```
+
+## Local Configuration (testing)
+
+### Install
 
 ```bash
 npm install
 ```
 
-## Configure
-
-Set environment variables or add a `.env` file:
+### Set environment variables or add a `.env` file:
 
 ```bash
 SHERLOCK_PROVIDER=ollama
@@ -61,29 +86,4 @@ Optional headers for OpenAI-compatible providers:
 ```bash
 SHERLOCK_REFERER=https://your-app.com
 SHERLOCK_APP_NAME=Sherlock
-```
-
-## Usage
-
-```bash
-node bin/sherlock.js investigate
-node bin/sherlock.js explain src/ai/factory.js -p "Security"
-node bin/sherlock.js blueprint "Add a new command for audit logs"
-```
-
-## npx
-
-Once published, you can run:
-
-```bash
-npx sherlock investigate
-```
-
-## Auth
-
-Store a single active provider locally for npx usage:
-
-```bash
-node bin/sherlock.js auth login
-node bin/sherlock.js auth logout
 ```
