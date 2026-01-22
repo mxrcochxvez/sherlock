@@ -11,8 +11,10 @@ export type SherlockConfig = {
   SHERLOCK_APP_NAME?: string;
 };
 
-const CONFIG_DIR = join(homedir(), ".sherlock");
+const CONFIG_DIR = join(homedir(), ".sherlook");
+const LEGACY_CONFIG_DIR = join(homedir(), ".sherlock");
 export const CONFIG_PATH = join(CONFIG_DIR, "config.json");
+const LEGACY_CONFIG_PATH = join(LEGACY_CONFIG_DIR, "config.json");
 
 export async function loadConfig(): Promise<SherlockConfig> {
   try {
@@ -20,7 +22,18 @@ export async function loadConfig(): Promise<SherlockConfig> {
     return JSON.parse(raw) as SherlockConfig;
   } catch (error) {
     if (error && (error as NodeJS.ErrnoException).code === "ENOENT") {
-      return {};
+      try {
+        const legacyRaw = await readFile(LEGACY_CONFIG_PATH, "utf8");
+        return JSON.parse(legacyRaw) as SherlockConfig;
+      } catch (legacyError) {
+        if (
+          legacyError &&
+          (legacyError as NodeJS.ErrnoException).code === "ENOENT"
+        ) {
+          return {};
+        }
+        throw legacyError;
+      }
     }
     throw error;
   }
@@ -37,6 +50,17 @@ export async function clearConfig(): Promise<void> {
     await rm(CONFIG_PATH);
   } catch (error) {
     if (error && (error as NodeJS.ErrnoException).code === "ENOENT") {
+      try {
+        await rm(LEGACY_CONFIG_PATH);
+      } catch (legacyError) {
+        if (
+          legacyError &&
+          (legacyError as NodeJS.ErrnoException).code === "ENOENT"
+        ) {
+          return;
+        }
+        throw legacyError;
+      }
       return;
     }
     throw error;

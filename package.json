@@ -1,10 +1,10 @@
 {
-  "name": "sherlock",
+  "name": "sherlook",
   "version": "0.1.0",
   "description": "AI-powered developer assistant CLI.",
   "type": "module",
   "bin": {
-    "sherlock": "dist/bin/sherlock.js"
+    "sherlook": "dist/bin/sherlook.js"
   },
   "files": [
     "dist",
@@ -14,7 +14,7 @@
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json -w",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "start": "node dist/bin/sherlock.js",
+    "start": "node dist/bin/sherlook.js",
     "prepublishOnly": "npm run build"
   },
   "engines": {

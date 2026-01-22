@@ -73,11 +73,11 @@ async function showIntro(): Promise<void> {
   if (!process.stdout.isTTY) {
     return;
   }
-  if (process.env.SHERLOCK_NO_INTRO === "1") {
+  if (process.env.SHERLOCK_NO_INTRO === "1" || process.env.SHERLOOK_NO_INTRO === "1") {
     return;
   }
 
-  const brand = chalk.hex("#f2d18b").bold("SHERLOCK");
+  const brand = chalk.hex("#f2d18b").bold("SHERLOOK");
   const accent = chalk.hex("#f2d18b");
   const line = chalk.dim("Minimal-lux CLI intelligence");
   const frames = [
@@ -293,7 +293,7 @@ async function investigateCommand(options: {
     ]);
 
     const systemPrompt = [
-      "You are Sherlock, a senior engineer assistant. Provide a concise, multi-perspective mental model of the project. Cover architecture, entry points, core flows, design system/UI patterns (if any), documented conventions, and common software patterns. Call out known issues or caveats if mentioned, and highlight likely hotspots (e.g., frequently touched or central files inferred from the structure). Keep it short, specific, and actionable.",
+      "You are Sherlook, a senior engineer assistant. Provide a concise, multi-perspective mental model of the project. Cover architecture, entry points, core flows, design system/UI patterns (if any), documented conventions, and common software patterns. Call out known issues or caveats if mentioned, and highlight likely hotspots (e.g., frequently touched or central files inferred from the structure). Keep it short, specific, and actionable.",
       options.plain ? "Respond in plain text without Markdown." : "",
     ]
       .filter(Boolean)
@@ -317,7 +317,7 @@ async function investigateCommand(options: {
     const response = await ai.generateResponse(systemPrompt, userPrompt);
     spinner.stop();
     const output = options.plain ? stripMarkdown(response) : response;
-    process.stdout.write(`${chalk.green("Sherlock:")}\n${output}\n`);
+    process.stdout.write(`${chalk.green("Sherlook:")}\n${output}\n`);
   } catch (error) {
     spinner.stop();
     process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
@@ -345,7 +345,7 @@ async function explainCommand(
 
     const perspective = options.perspective || "general";
     const systemPrompt = [
-      "You are Sherlock, a senior engineer assistant. Explain code clearly and succinctly. Include architecture role, design/system considerations, data flow, common patterns, and any risks or caveats you can infer. Keep it focused and actionable.",
+      "You are Sherlook, a senior engineer assistant. Explain code clearly and succinctly. Include architecture role, design/system considerations, data flow, common patterns, and any risks or caveats you can infer. Keep it focused and actionable.",
       options.plain ? "Respond in plain text without Markdown." : "",
     ]
       .filter(Boolean)
@@ -361,7 +361,7 @@ async function explainCommand(
     const response = await ai.generateResponse(systemPrompt, userPrompt);
     spinner.stop();
     const output = options.plain ? stripMarkdown(response) : response;
-    process.stdout.write(`${chalk.green("Sherlock:")}\n${output}\n`);
+    process.stdout.write(`${chalk.green("Sherlook:")}\n${output}\n`);
   } catch (error) {
     spinner.stop();
     process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
@@ -383,7 +383,7 @@ async function blueprintCommand(
       .sort((a, b) => a.localeCompare(b));
 
     const systemPrompt = [
-      "You are Sherlock, a senior engineer assistant. Identify relevant files for implementing the request. Consider architecture boundaries, design system/UI implications, shared patterns, and likely hotspots to change. Return a short, actionable list.",
+      "You are Sherlook, a senior engineer assistant. Identify relevant files for implementing the request. Consider architecture boundaries, design system/UI implications, shared patterns, and likely hotspots to change. Return a short, actionable list.",
       options.plain ? "Respond in plain text without Markdown." : "",
     ]
       .filter(Boolean)
@@ -402,7 +402,7 @@ async function blueprintCommand(
     const response = await ai.generateResponse(systemPrompt, userPrompt);
     spinner.stop();
     const output = options.plain ? stripMarkdown(response) : response;
-    process.stdout.write(`${chalk.green("Sherlock:")}\n${output}\n`);
+    process.stdout.write(`${chalk.green("Sherlook:")}\n${output}\n`);
   } catch (error) {
     spinner.stop();
     process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
@@ -545,7 +545,7 @@ async function listModelsCommand(options: ModelListOptions): Promise<void> {
     const config = await loadConfig();
     const provider = options.provider || config.SHERLOCK_PROVIDER;
     if (!provider) {
-      throw new Error("No provider configured. Run `sherlock auth login` first.");
+      throw new Error("No provider configured. Run `sherlook auth login` first.");
     }
 
     let models: string[] = [];
@@ -620,7 +620,7 @@ async function listModelsCommand(options: ModelListOptions): Promise<void> {
 
 const program = new Command();
 program
-  .name("sherlock")
+  .name("sherlook")
   .description("AI-powered developer assistant CLI")
   .version("0.1.0");
 

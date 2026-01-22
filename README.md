@@ -1,6 +1,6 @@
-# Sherlock
+# Sherlook
 
-Sherlock is an AI-powered developer assistant CLI that helps you understand and navigate complex codebases.
+Sherlook is an AI-powered developer assistant CLI that helps you understand and navigate complex codebases.
 
 Built with TypeScript, Commander.js, and a model-agnostic AI layer.
 
@@ -19,7 +19,7 @@ npm run build
 Run the compiled CLI:
 
 ```bash
-node dist/bin/sherlock.js investigate
+node dist/bin/sherlook.js investigate
 ```
 
 ## Configure
@@ -27,8 +27,8 @@ node dist/bin/sherlock.js investigate
 Use the built-in auth flow to store a single active provider locally:
 
 ```bash
-node dist/bin/sherlock.js auth login
-node dist/bin/sherlock.js auth logout
+node dist/bin/sherlook.js auth login
+node dist/bin/sherlook.js auth logout
 ```
 
 Note: credentials are stored locally and only used to authenticate API requests.
@@ -91,33 +91,33 @@ Optional headers for OpenAI-compatible providers:
 
 ```bash
 SHERLOCK_REFERER=https://your-app.com
-SHERLOCK_APP_NAME=Sherlock
+SHERLOCK_APP_NAME=Sherlook
 ```
 
 ## Usage
 
 ```bash
-node dist/bin/sherlock.js investigate
-node dist/bin/sherlock.js explain src/ai/factory.ts -p "Security"
-node dist/bin/sherlock.js blueprint "Add a new command for audit logs"
+node dist/bin/sherlook.js investigate
+node dist/bin/sherlook.js explain src/ai/factory.ts -p "Security"
+node dist/bin/sherlook.js blueprint "Add a new command for audit logs"
 ```
 
 Pick a model for the configured provider:
 
 ```bash
-node dist/bin/sherlock.js list
+node dist/bin/sherlook.js list
 ```
 
 Return plain text (no Markdown):
 
 ```bash
-node dist/bin/sherlock.js investigate --plain
+node dist/bin/sherlook.js investigate --plain
 ```
 
 Override the model for a single run:
 
 ```bash
-node dist/bin/sherlock.js investigate -m gemini-3-flash-preview
+node dist/bin/sherlook.js investigate -m gemini-3-flash-preview
 ```
 
 ## npx
@@ -125,7 +125,7 @@ node dist/bin/sherlock.js investigate -m gemini-3-flash-preview
 Once published, you can run:
 
 ```bash
-npx sherlock investigate
+npx sherlook investigate
 ```
 
 ## Demo site (GitHub Pages)
