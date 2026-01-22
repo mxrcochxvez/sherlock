@@ -2,40 +2,36 @@
 
 Sherlock is an AI-powered developer assistant CLI that helps you understand and navigate complex codebases.
 
-## Auth
+Built with TypeScript, Commander.js, and a model-agnostic AI layer.
 
-Store a single active provider locally for npx usage:
-
-```bash
-node bin/sherlock.js auth login
-node bin/sherlock.js auth logout
-```
-
-## Usage
-
-```bash
-node bin/sherlock.js investigate
-node bin/sherlock.js explain src/ai/factory.js -p "Security"
-node bin/sherlock.js blueprint "Add a new command for audit logs"
-```
-
-## npx
-
-> 🚧 Once published 🚧
-
-```bash
-npx sherlock investigate
-```
-
-## Local Configuration (testing)
-
-### Install
+## Install
 
 ```bash
 npm install
 ```
 
-### Set environment variables or add a `.env` file:
+## Build
+
+```bash
+npm run build
+```
+
+Run the compiled CLI:
+
+```bash
+node dist/bin/sherlock.js investigate
+```
+
+## Configure
+
+Use the built-in auth flow to store a single active provider locally:
+
+```bash
+node dist/bin/sherlock.js auth login
+node dist/bin/sherlock.js auth logout
+```
+
+You can still use environment variables if needed:
 
 ```bash
 SHERLOCK_PROVIDER=ollama
@@ -87,3 +83,26 @@ Optional headers for OpenAI-compatible providers:
 SHERLOCK_REFERER=https://your-app.com
 SHERLOCK_APP_NAME=Sherlock
 ```
+
+## Usage
+
+```bash
+node dist/bin/sherlock.js investigate
+node dist/bin/sherlock.js explain src/ai/factory.ts -p "Security"
+node dist/bin/sherlock.js blueprint "Add a new command for audit logs"
+```
+
+## npx
+
+Once published, you can run:
+
+```bash
+npx sherlock investigate
+```
+
+## Demo site (GitHub Pages)
+
+The demo lives in `docs/`. To publish:
+
+1. Push `docs/` to `main`.
+2. In GitHub repo settings, enable Pages and choose `main` + `/docs`.
