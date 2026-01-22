@@ -180,6 +180,61 @@ function buildEnvOverrides(model?: string): NodeJS.ProcessEnv {
   };
 }
 
+function renderAuthSetupHint(error: unknown): string | null {
+  const message = getErrorMessage(error);
+  if (message.includes("SHERLOCK_PROVIDER is required")) {
+    return [
+      "No provider configured yet.",
+      "Run `sherlook auth login` to set up a provider and API key.",
+      "Example: sherlook auth login",
+    ].join("\n");
+  }
+  if (message.includes("SHERLOCK_API_KEY is required")) {
+    return [
+      "Missing API key for the configured provider.",
+      "Run `sherlook auth login` to save your credentials.",
+    ].join("\n");
+  }
+  if (message.includes("Ollama provider requires SHERLOCK_MODEL")) {
+    return [
+      "Ollama model not configured yet.",
+      "Run `sherlook list --provider ollama` to select a model.",
+    ].join("\n");
+  }
+  return null;
+}
+
+function isOllamaModelNotFound(error: unknown): boolean {
+  const message = getErrorMessage(error).toLowerCase();
+  return (
+    message.includes("ollama request failed") &&
+    message.includes("model") &&
+    message.includes("not found")
+  );
+}
+
+async function handleUserSetupError(error: unknown): Promise<boolean> {
+  const hint = renderAuthSetupHint(error);
+  if (hint) {
+    process.stderr.write(`${chalk.yellow("Setup required:")}\n${hint}\n`);
+    return true;
+  }
+
+  if (process.env.SHERLOCK_PROVIDER !== "ollama") {
+    return false;
+  }
+  if (!isOllamaModelNotFound(error)) {
+    return false;
+  }
+
+  process.stderr.write(
+    `${chalk.yellow("Model not found for Ollama.")}\nSelect a model to continue.\n`
+  );
+  await listModelsCommand({ provider: "ollama" });
+  process.stderr.write("Re-run your command after selecting a model.\n");
+  return true;
+}
+
 function deriveOllamaTagsUrl(apiUrl?: string): string {
   if (!apiUrl) {
     return DEFAULT_OLLAMA_TAGS_URL;
@@ -320,7 +375,9 @@ async function investigateCommand(options: {
     process.stdout.write(`${chalk.green("Sherlook:")}\n${output}\n`);
   } catch (error) {
     spinner.stop();
-    process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
+    if (!(await handleUserSetupError(error))) {
+      process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
+    }
     process.exitCode = 1;
   }
 }
@@ -364,7 +421,9 @@ async function explainCommand(
     process.stdout.write(`${chalk.green("Sherlook:")}\n${output}\n`);
   } catch (error) {
     spinner.stop();
-    process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
+    if (!(await handleUserSetupError(error))) {
+      process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
+    }
     process.exitCode = 1;
   }
 }
@@ -405,7 +464,9 @@ async function blueprintCommand(
     process.stdout.write(`${chalk.green("Sherlook:")}\n${output}\n`);
   } catch (error) {
     spinner.stop();
-    process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
+    if (!(await handleUserSetupError(error))) {
+      process.stderr.write(`${chalk.red("Error:")} ${getErrorMessage(error)}\n`);
+    }
     process.exitCode = 1;
   }
 }
