@@ -4,31 +4,13 @@ Sherlook is an AI-powered developer assistant CLI that helps you understand and 
 
 Built with TypeScript, Commander.js, and a model-agnostic AI layer.
 
-## Install
-
-```bash
-npm install
-```
-
-## Build
-
-```bash
-npm run build
-```
-
-Run the compiled CLI:
-
-```bash
-node dist/bin/sherlook.js investigate
-```
-
 ## Configure
 
 Use the built-in auth flow to store a single active provider locally:
 
 ```bash
-node dist/bin/sherlook.js auth login
-node dist/bin/sherlook.js auth logout
+npx sherlook auth login
+npx sherlook auth logout
 ```
 
 Note: credentials are stored locally and only used to authenticate API requests.
@@ -94,38 +76,70 @@ SHERLOCK_REFERER=https://your-app.com
 SHERLOCK_APP_NAME=Sherlook
 ```
 
-## Usage
+## Quick start (npx)
 
 ```bash
-node dist/bin/sherlook.js investigate
-node dist/bin/sherlook.js explain src/ai/factory.ts -p "Security"
-node dist/bin/sherlook.js blueprint "Add a new command for audit logs"
+npx sherlook investigate
+```
+
+## Commands
+
+Investigate a repo and get a concise multi‑perspective mental model:
+
+```bash
+npx sherlook investigate
+```
+
+Explain a file from a chosen perspective:
+
+```bash
+npx sherlook explain src/ai/factory.ts -p "Security"
+```
+
+Blueprint which files to change for a feature request:
+
+```bash
+npx sherlook blueprint "Add a new command for audit logs"
 ```
 
 Pick a model for the configured provider:
 
 ```bash
-node dist/bin/sherlook.js list
+npx sherlook list
 ```
 
-Return plain text (no Markdown):
+## Options
+
+Return plain text (no Markdown) for any command:
 
 ```bash
-node dist/bin/sherlook.js investigate --plain
+npx sherlook investigate --plain
 ```
 
 Override the model for a single run:
 
 ```bash
-node dist/bin/sherlook.js investigate -m gemini-3-flash-preview
+npx sherlook investigate -m gemini-3-flash-preview
 ```
 
-## npx
+## Local development
 
-Once published, you can run:
+Install dependencies:
 
 ```bash
-npx sherlook investigate
+npm install
+```
+
+Build:
+
+```bash
+npm run build
+```
+
+Run the compiled CLI:
+
+```bash
+node dist/bin/sherlook.js investigate
 ```
 
 ## Demo site (GitHub Pages)
