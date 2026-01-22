@@ -1,18 +1,16 @@
-const DEFAULT_GOOGLE_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models";
+import { GoogleGenAI } from "@google/genai";
 
 type GoogleProviderOptions = {
   apiKey?: string;
   model?: string;
-  apiUrl?: string;
 };
 
 export class GoogleAIProvider {
   private apiKey: string;
   private model: string;
-  private apiUrl: string;
+  private client: GoogleGenAI;
 
-  constructor({ apiKey, model, apiUrl }: GoogleProviderOptions = {}) {
+  constructor({ apiKey, model }: GoogleProviderOptions = {}) {
     if (!apiKey) {
       throw new Error("Google AI provider requires SHERLOCK_API_KEY to be set.");
     }
@@ -22,43 +20,16 @@ export class GoogleAIProvider {
 
     this.apiKey = apiKey;
     this.model = model;
-    this.apiUrl = apiUrl || DEFAULT_GOOGLE_URL;
+    this.client = new GoogleGenAI({ apiKey: this.apiKey });
   }
 
   async generateResponse(systemPrompt: string, userPrompt: string): Promise<string> {
-    const url = `${this.apiUrl}/${encodeURIComponent(
-      this.model
-    )}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [
-              { text: `System:\n${systemPrompt}` },
-              { text: `\nUser:\n${userPrompt}` },
-            ],
-          },
-        ],
-      }),
+    const prompt = `System:\n${systemPrompt}\n\nUser:\n${userPrompt}`;
+    const response = await this.client.models.generateContent({
+      model: this.model,
+      contents: prompt,
     });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Google AI request failed (${response.status}): ${errorText}`
-      );
-    }
-
-    const data = (await response.json()) as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-    };
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = (response as { text?: string }).text;
     if (typeof text !== "string") {
       throw new Error("Google AI response missing expected text content.");
     }

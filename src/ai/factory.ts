@@ -43,7 +43,7 @@ export function createProvider(env: EnvLike = process.env) {
       if (!apiKey) {
         throw new Error("SHERLOCK_API_KEY is required for Google AI.");
       }
-      return new GoogleAIProvider({ apiKey, model, apiUrl });
+      return new GoogleAIProvider({ apiKey, model });
     default: {
       const compatibleUrl =
         OPENAI_COMPATIBLE[provider as keyof typeof OPENAI_COMPATIBLE];
