@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sherlock CLI</title>
+    <meta
+      name="description"
+      content="Sherlock is an AI-powered developer assistant CLI for understanding codebases."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="panel hero">
+        <div class="panel-inner">
+          <div class="hero-copy">
+            <p class="eyebrow reveal" style="--delay: 0ms">Sherlock CLI</p>
+            <h1 class="reveal" style="--delay: 120ms">Understand any codebase in minutes.</h1>
+            <p class="lede reveal" style="--delay: 240ms">
+              Model-agnostic, terminal-native, and built for fast mental models.
+              Switch providers without changing your workflow.
+            </p>
+            <div class="hero-actions reveal" style="--delay: 360ms">
+              <button class="copy-button" data-copy="npx sherlock investigate">
+                Copy: npx sherlock investigate
+              </button>
+              <a class="ghost-button" href="#commands">See commands</a>
+            </div>
+          </div>
+          <div class="terminal-card reveal" style="--delay: 480ms">
+            <div class="terminal-bar">
+              <span></span><span></span><span></span>
+            </div>
+            <pre><code>$ sherlock investigate
+Sherlock:
+Stack: Node.js CLI + AI providers
+Entry point: src/bin/sherlock.ts
+Purpose: map codebase intent fast</code></pre>
+          </div>
+        </div>
+      </header>
+
+      <section class="panel grid" id="commands">
+        <div class="panel-inner">
+          <div class="section-title">
+            <h2 class="reveal" style="--delay: 0ms">Core commands</h2>
+            <p class="reveal" style="--delay: 120ms">Fast answers for deep codebases.</p>
+          </div>
+          <div class="card-grid">
+            <article class="card reveal" style="--delay: 240ms">
+              <h3>investigate</h3>
+              <p>Summarize project stack, entry points, and purpose.</p>
+              <button class="copy-button" data-copy="sherlock investigate">
+                Copy command
+              </button>
+            </article>
+            <article class="card reveal" style="--delay: 360ms">
+              <h3>explain &lt;path&gt;</h3>
+              <p>Explain a file from any perspective.</p>
+              <button
+                class="copy-button"
+                data-copy="sherlock explain src/ai/factory.ts -p Security"
+              >
+                Copy command
+              </button>
+            </article>
+            <article class="card reveal" style="--delay: 480ms">
+              <h3>blueprint &lt;request&gt;</h3>
+              <p>Map which files should change for a feature request.</p>
+              <button
+                class="copy-button"
+                data-copy='sherlock blueprint "Add an audit trail"'
+              >
+                Copy command
+              </button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel providers">
+        <div class="panel-inner">
+          <div class="section-title">
+            <h2 class="reveal" style="--delay: 0ms">Provider switching</h2>
+            <p class="reveal" style="--delay: 120ms">
+              One active provider at a time, saved locally.
+            </p>
+          </div>
+          <div class="provider-grid reveal" style="--delay: 240ms">
+            <div class="pill">OpenAI</div>
+            <div class="pill">Anthropic</div>
+            <div class="pill">Google AI</div>
+            <div class="pill">Ollama</div>
+            <div class="pill">OpenRouter</div>
+            <div class="pill">Hugging Face</div>
+            <div class="pill">Groq</div>
+            <div class="pill">Together</div>
+            <div class="pill">Mistral</div>
+            <div class="pill">Perplexity</div>
+          </div>
+          <div class="code-block reveal" style="--delay: 360ms">
+            <pre><code>$ sherlock auth login
+$ sherlock auth logout</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel steps">
+        <div class="panel-inner">
+          <div class="section-title">
+            <h2 class="reveal" style="--delay: 0ms">How it works</h2>
+            <p class="reveal" style="--delay: 120ms">Three steps to clarity.</p>
+          </div>
+          <div class="step-grid">
+            <div class="step reveal" style="--delay: 240ms">
+              <span>01</span>
+              <h4>Scan metadata</h4>
+              <p>Read README and package.json for context.</p>
+            </div>
+            <div class="step reveal" style="--delay: 360ms">
+              <span>02</span>
+              <h4>Map structure</h4>
+              <p>List paths or file trees without token-heavy reads.</p>
+            </div>
+            <div class="step reveal" style="--delay: 480ms">
+              <span>03</span>
+              <h4>Ask Sherlock</h4>
+              <p>Get concise, actionable guidance for changes.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel cta">
+        <div class="panel-inner">
+          <div>
+            <h2 class="reveal" style="--delay: 0ms">Ready to investigate?</h2>
+            <p class="reveal" style="--delay: 120ms">
+              Run Sherlock in any repo to get instant direction.
+            </p>
+          </div>
+          <button class="copy-button reveal" data-copy="npx sherlock investigate" style="--delay: 240ms">
+            Copy: npx sherlock investigate
+          </button>
+        </div>
+      </section>
+
+      <footer class="panel footer">
+        <div class="panel-inner">
+          <p>Built for fast understanding. Sherlock CLI.</p>
+        </div>
+      </footer>
+    </div>
+
+    <nav class="panel-nav" aria-label="Section navigation">
+      <button class="panel-dot is-active" data-index="0" aria-label="Hero"></button>
+      <button class="panel-dot" data-index="1" aria-label="Commands"></button>
+      <button class="panel-dot" data-index="2" aria-label="Providers"></button>
+      <button class="panel-dot" data-index="3" aria-label="Steps"></button>
+      <button class="panel-dot" data-index="4" aria-label="Call to action"></button>
+      <button class="panel-dot" data-index="5" aria-label="Footer"></button>
+    </nav>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
